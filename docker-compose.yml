@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  rabbit1:
+    build:
+      context: rabbitmq/.
+      dockerfile: Dockerfile
+    hostname: rabbit1
+    environment:
+      - ERLANG_COOKIE=$ERLANG_COOKIE
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 1883:1883
+    volumes:
+      - rabbit1_data:/var/lib/rabbitmq
+      - ./rabbitmq_etc:/etc/rabbitmq
+  rabbit2:
+    build:
+      context: rabbitmq/.
+      dockerfile: Dockerfile
+    environment:
+      - ERLANG_COOKIE=$ERLANG_COOKIE
+      - CLUSTER_WITH=rabbit1
+    ports:
+      - 5673:5672
+      - 15673:15672
+      - 1884:1883
+    volumes:
+      - rabbit2_data:/var/lib/rabbitmq
+      - ./rabbitmq_etc:/etc/rabbitmq
+    depends_on:
+      - rabbit1
+  rabbit3:
+    build:
+      context: rabbitmq/.
+      dockerfile: Dockerfile
+    environment:
+      - ERLANG_COOKIE=$ERLANG_COOKIE
+      - CLUSTER_WITH=rabbit1
+    ports:
+      - 5674:5672
+      - 15674:15672
+      - 1885:1883
+    volumes:
+      - rabbit3_data:/var/lib/rabbitmq
+      - ./rabbitmq_etc:/etc/rabbitmq
+    depends_on:
+      - rabbit1
+
+volumes:
+  rabbit1_data:
+  rabbit2_data:
+  rabbit3_data:
